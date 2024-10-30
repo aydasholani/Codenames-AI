@@ -6,7 +6,7 @@ def save_card_images(img, card_boxes, recognized_texts, image_name):
     """Saves each detected card as an image and records data in JSON format."""
     output_dir = os.path.join(os.getcwd(), "modelv12", "results", image_name)
     os.makedirs(output_dir, exist_ok=True)
-    
+    cv2.imwrite(os.path.join(output_dir, "board.png"), img)
     json_data = []
     
     for i, (box, text) in enumerate(zip(card_boxes, recognized_texts), start=1):
@@ -31,6 +31,7 @@ def save_card_images(img, card_boxes, recognized_texts, image_name):
         json_data.append(card_info)
 
     
+
     json_path = os.path.join(output_dir, "card_data.json")
     with open(json_path, 'w', encoding='utf-8') as json_file:
         json.dump(json_data, json_file, ensure_ascii=False, indent=4)

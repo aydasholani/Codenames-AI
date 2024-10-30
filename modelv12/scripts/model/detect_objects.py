@@ -5,5 +5,7 @@ def detect_objects(model, img, conf, save_dir):
         img,
         conf=conf,
         imgsz=640,
-        save_dir=save_dir
+        save=True,
+        project="modelv12",
+        name="runs/detect/test"
     )
