@@ -34,18 +34,17 @@ def detect_words_with_yolo(image_path, conf=0.5, tolerance=50):
         return img, card_boxes, textbox_boxes
 
     # Sort card boxes by position and save them
-    sorted_card_boxes = sort_boxes(card_boxes, tolerance)
-
+    sorted_textbox_boxes = sort_boxes(textbox_boxes, tolerance)
     reader = initialize_easyocr(lang_list=['en', 'sv'])  # Lägg till andra språk vid behov
-    recognized_texts = recognize_text_from_boxes(img, textbox_boxes, reader)
-    
+
+    recognized_texts = recognize_text_from_boxes(img, sorted_textbox_boxes, reader)
     correct_texts = []
     for text in recognized_texts:
         if check_word_in_list(text):
             correct_texts.append(text)
         else:
             print(f"Word '{text}' is not in the word list.")
-    save_card_images(img, sorted_card_boxes, correct_texts, image_name)
+    save_card_images(img, textbox_boxes, correct_texts, image_name)
 
     return correct_texts
 
@@ -56,13 +55,14 @@ detect_words_with_yolo(test_image)
 
 
 folder = os.path.join(os.getcwd(), "modelv12", "test")
+test_image = os.path.join(folder, "board_003.png")
+print(detect_words_with_yolo(test_image))
+# for img in os.listdir(folder):
+#     img_path = os.path.join(folder, img)
+#     if img_path.endswith((".png", ".jpg", ".jpeg")):
 
-for img in os.listdir(folder):
-    img_path = os.path.join(folder, img)
-    if img_path.endswith((".png", ".jpg", ".jpeg")):
-
-        texts = detect_words_with_yolo(img_path)
+#         texts = detect_words_with_yolo(img_path)
             
-        print(texts)
-        print(len(texts)/25)
-        print(type(texts))
+#         print(texts)
+#         print(len(texts)/25)
+#         print(type(texts))
