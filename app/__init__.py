@@ -1,33 +1,37 @@
-import os
 from PIL import Image
-from flask import Flask, jsonify, render_template
-from dotenv import load_dotenv
-from flask import request
+from flask import Flask, jsonify, render_template, request, url_for
+from PIL import Image
 from .ocr.detect_words import detect_words
-app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-  
-@app.route('/upload', methods=['POST'])
-def upload():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
+def create_app():
+    app = Flask(__name__)
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'})
+    @app.route('/', methods=['GET', 'POST'])
+    def index():
+        detected_words = []  # Tom lista för de detekterade orden
+        error = None  # Variabel för felmeddelanden
 
-    if file:
-        # Läs in bilden direkt i minnet
-        image = Image.open(file.stream)
+        if request.method == 'POST':
+            # Kontrollera om en fil skickades med förfrågan
+            if 'file' not in request.files:
+                error = "No file part in request"
+            else:
+                file = request.files['file']
+                if file.filename == '':
+                    error = "No selected file"
+                else:
+                    try:
+                        # Läs in bilden och bearbeta den
+                        image = Image.open(file.stream)
+                        detected_words = detect_words(image)  # Kör ordigenkänningsfunktionen
+                    except Exception as e:
+                        error = f"Error processing image: {str(e)}"
 
-        # Kör detektering och OCR direkt på bilden
-        detected_words = detect_words(image)
+        return render_template('routes/index.html', detected_words=detected_words, error=error)
 
-        # Returnera resultat som JSON
-        return jsonify({'detected_words': detected_words})
 
+    return app
+# Om skriptet körs direkt, skapa och kör appen
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)

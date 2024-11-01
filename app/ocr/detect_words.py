@@ -11,9 +11,8 @@ from .text_recognition import recognize_text_from_boxes, initialize_easyocr, che
 
 
 def detect_words(image, conf=0.5, tolerance=50):
-    model_path = os.path.join(os.getcwd(), "modelv12", "runs/detect/train/weights/best.pt")
-    save_dir = os.path.join(os.getcwd(), "modelv12")
-    
+    model_path = os.path.join(os.getcwd(), "app", "model", "best.pt")
+
     # Använd ett standardnamn för bilden om du behöver det för att spara resultat
     image_name = "processed_image"
 
@@ -26,7 +25,7 @@ def detect_words(image, conf=0.5, tolerance=50):
         return None, [], []
 
     # Detect objects (cards and textboxes)
-    results = detect_objects(model, img, conf, save_dir)
+    results = detect_objects(model, img, conf)
 
     # Extract bounding boxes
     card_boxes, textbox_boxes = extract_boxes(results)
@@ -34,19 +33,19 @@ def detect_words(image, conf=0.5, tolerance=50):
         print("No cards detected.")
         return img, card_boxes, textbox_boxes
 
-    # Sortera kortboxar och textboxar
+    # Sortera textboxar
     sorted_card_boxes = sort_boxes(card_boxes, tolerance)
-    sorted_textbox_boxes = sort_boxes(textbox_boxes, tolerance)
+    sorted_textboxes = sort_boxes(textbox_boxes, tolerance)
 
     # OCR på textboxarna
     reader = initialize_easyocr(lang_list=['en', 'sv'])  # Lägg till andra språk vid behov
-    recognized_texts = recognize_text_from_boxes(img, sorted_textbox_boxes, reader)
+    recognized_texts = recognize_text_from_boxes(img, sorted_textboxes, reader)
 
     # Filtrera igenkända texter mot ordlistan
     correct_words = []
     for text in recognized_texts:
         if check_word_in_list(text):
-            correct_words.append(text)
+            correct_words.append(text.upper())
         else:
             print(f"Word '{text}' is not in the word list.")
 

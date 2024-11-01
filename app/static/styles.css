@@ -1,76 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'DM Sans', sans-serif;
+.game-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  background-color: #fff;
+  padding: 5px;
+  max-width: fit-content(20em);
 }
 
-body {
-  background: #F5F7FB;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  width: 400px;
+.game-card {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
   text-align: center;
-}
-
-h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-button {
-  background-color: #6C63FF;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
+  margin: 10px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  border-color: #eae5e1;
+  background-color: #faebd7; /* Lätt bakgrundsfärg för korten */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Skugga för att ge djup */
+  transition: transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-button:hover {
-  background-color: #5851DB;
+.red { background-color: red; }
+.blue { background-color: blue; }
+.beige { background-color: #f5deb3;}
+.black { background-color: black; }
+
+.game-card:hover {
+  transform: scale(1.05); /* Gör kortet större vid hover */
 }
 
-input[type="file"] {
-  display: none;
-}
-
-.label-button {
-  background-color: #6C63FF;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
+.game-card-text-wrapper {
+  padding: 10px;
+  border-color: #a48779;
+  background-color: #fff;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  display: inline-block;
-  margin-bottom: 20px;
+  width: 100%;
 }
-
-.label-button:hover {
-  background-color: #5851DB;
-}
-
-.result {
-  margin-top: 20px;
-  font-size: 16px;
+.game-card-text {
+  /* font-size: 1.2em; */
+  font-weight: bold;
   color: #333;
+  text-align: center;
+  margin: 0;
 }
+
