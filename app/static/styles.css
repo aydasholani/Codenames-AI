@@ -21,10 +21,21 @@
   align-items: center;
 }
 
-.red { background-color: red; }
-.blue { background-color: blue; }
-.beige { background-color: #f5deb3;}
-.black { background-color: black; }
+.red { 
+  /* background-color: red; */
+  border: 5px solid red; 
+}
+.blue { 
+  /* background-color: blue; */
+  border: 5px solid blue; 
+}
+.beige { 
+  border: inherit;
+}
+.black { 
+  /* background-color: black; */
+  border: 5px solid black; 
+}
 
 .game-card:hover {
   transform: scale(1.05); /* Gör kortet större vid hover */
@@ -45,3 +56,45 @@
   margin: 0;
 }
 
+@media only screen and (orientation: landscape) {
+  /* Här ställer du in layouten för liggande läge */
+
+  .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;  /* Gör att innehållet centreras vertikalt */
+  }
+
+  .game-wrapper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 5 kolumner */
+      grid-gap: 10px;
+  }
+
+  .game-card {
+      width: 100%;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      color: white;
+  }
+}
+
+@media only screen and (orientation: portrait) {
+  /* Anpassa layouten för stående läge på mobil */
+  .container {
+      display: block;
+      margin: 0 auto;
+      padding: 10px;
+  }
+
+  .game-wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Mindre kolumner i stående */
+      grid-gap: 8px;
+  }
+}

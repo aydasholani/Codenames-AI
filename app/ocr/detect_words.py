@@ -34,7 +34,6 @@ def detect_words(image, conf=0.5, tolerance=50):
         return img, card_boxes, textbox_boxes
 
     # Sortera textboxar
-    sorted_card_boxes = sort_boxes(card_boxes, tolerance)
     sorted_textboxes = sort_boxes(textbox_boxes, tolerance)
 
     # OCR på textboxarna

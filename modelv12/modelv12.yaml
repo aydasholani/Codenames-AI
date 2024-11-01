@@ -1,4 +1,4 @@
-path: modelv12
+path: .
 train: images/train
 val: images/val
 test: images/test

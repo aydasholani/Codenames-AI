@@ -1,0 +1,15 @@
+{% macro game_grid(board) %} 
+  <div class="game-wrapper">
+    {% for item in board %}
+      {% for word, color in item.items() %}
+        <div class="game-card {{ color }}">
+          <div class="game-card-text-wrapper">
+            <p class="game-card-text">
+              {{ word }}
+            </p>
+          </div>
+        </div> 
+      {% endfor %}
+    {% endfor %}
+  </div>
+{% endmacro %}

@@ -23,9 +23,11 @@
         {% if error %}
             <p class="text-danger">{{ error }}</p>
         {% endif %}
-        {% import "macros/word_grid.html" as macros %}
-        {% if detected_words %}
-            {{ macros.word_grid(detected_words) }}
+
+
+        {% from "macros/_game_grid.html" import game_grid with context %} 
+        {% if words_with_colors %}
+          {{ game_grid(words_with_colors) }}
         {% endif %}
     </div>
   </div>
