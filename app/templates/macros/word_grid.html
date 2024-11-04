@@ -1,13 +1,13 @@
 {% macro word_grid(words) %}
   <div class="game-wrapper">
     {% for word in words%}
-      <div class="game-card">
-        <div class="game-card-text-wrapper">
-          <p class="game-card-text">
-            {{ word if word else "" }}  
-          </p>
-        </div>
-      </div> 
+    <div class="game-card">
+      <div class="game-card-text-wrapper">
+        <p class="game-card-text">
+          {{ word if word else "" }}  
+        </p>
+      </div>
+    </div> 
     {% endfor %}
   </div>
 {% endmacro %}

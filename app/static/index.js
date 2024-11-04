@@ -58,3 +58,14 @@ async function uploadImage() {
     loadingButton.classList.add("d-none"); // Dölj loading-knappen
   }
 }
+
+async function updateFileName() {
+  const fileInput = document.getElementById("fileInput");
+  const fileNameDisplay = document.getElementById("fileName");
+  const file = fileInput.files[0];
+  if (file) {
+    fileNameDisplay.textContent = file.name;
+  } else {
+    fileNameDisplay.textContent = "";
+  }
+}

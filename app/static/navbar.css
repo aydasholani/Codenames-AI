@@ -1,0 +1,49 @@
+nav {
+  background-color: #333;
+  padding: 10px;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+nav ul li {
+  margin-right: 20px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+nav ul li form {
+  display: flex;
+  align-items: center;
+}
+
+nav ul li input[type="file"] {
+  margin-right: 10px;
+  color: white;
+}
+
+nav ul li button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+nav ul li button:hover {
+  background-color: #0056b3;
+}
+
+.hidden-file-input {
+  display: none !important;
+}
