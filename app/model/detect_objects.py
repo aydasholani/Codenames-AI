@@ -1,3 +1,4 @@
+import numpy as np
 
 def detect_objects(model, img, conf):
     """Runs the YOLO model prediction on the image and returns results."""
@@ -6,4 +7,5 @@ def detect_objects(model, img, conf):
         conf=conf,
         imgsz=640,
         save=False,
+        max_det=50,
     )
