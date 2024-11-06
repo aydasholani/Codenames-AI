@@ -3,7 +3,7 @@ import os
 from difflib import get_close_matches
 
 def load_word_list():
-    file_path = os.path.join(os.getcwd(), "app", "ocr", 'codenames-swe.txt')
+    file_path = os.path.join(os.getcwd(), "app", "ocr", 'codenames-swedish.txt')
     with open(file_path, 'r', encoding='utf-8') as file:
         word_list = {line.strip().upper() for line in file} 
     return word_list
@@ -32,14 +32,15 @@ def read_text_from_textbox(reader, textbox):
             decoder='wordbeamsearch', 
             beamWidth=20, 
             allowlist=allowlist,
-            min_size=4
+            min_size=4,
+            text_threshold=0.7,
     )
     
     for (bbox, text, prob) in results:
         print(f'Text: {text}, Probability: {prob}')
     return results
 
-def recognize_text(image, boxes, min_words=25):
+def recognize_text(image, boxes):
     correct_words = []
     reader = initialize_easyocr()
     
