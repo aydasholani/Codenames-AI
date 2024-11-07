@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Lagindelning för Rum {{ room_code }}</h1>
+<ul>
+    <h2>Röda Laget:</h2>
+    {% for user in red_team %}
+        <li>{{ user.name }}{% if user.is_agent %} (Agent) {% endif %}</li>
+    {% endfor %}
+</ul>
+<ul>
+    <h2>Blåa Laget:</h2>
+    {% for user in blue_team %}
+        <li>{{ user.name }}{% if user.is_agent %} (Agent) {% endif %}</li>
+    {% endfor %}
+</ul>
+
+{% if session.get('owner_id') == room.owner_id %}
+    <form action="{{ url_for('game.start_round') }}" method="POST">
+        <button type="submit">Starta runda</button>
+    </form>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='show_teams.js') }}"></script>
+{% endif %}
+{% endblock %}

@@ -70,19 +70,3 @@
   .game-card.beige {
       border-color: beige;
   }
-/* } */
-
-
-/* @media only screen and (orientation: portrait) {
-  .board {
-      padding: 10px;
-  }
-
-  #results {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-gap: 8px;
-      width: 100%;
-      max-width: 90vw;
-  }
-} */

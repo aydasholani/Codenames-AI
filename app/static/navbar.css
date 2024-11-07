@@ -20,6 +20,10 @@ nav ul li a {
   color: white;
   text-decoration: none;
 }
+nav ul:last-child {
+  color: #007bff;
+  align-self: flex-end;
+}
 
 nav ul li form {
   display: flex;

@@ -1,41 +1,69 @@
-from flask import Flask, render_template, request
+# myapp/__init__.py
+from flask import Flask, jsonify, session, request
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from . import db_conn  # Importera din databasmodul
+import os
+from dotenv import load_dotenv
+from .models import User, Room 
+# Ladda miljövariabler
+load_dotenv()
 
-from .image_processing.read_image import load_and_preprocess_image
-from .ocr.detect_words import detect_words
-from .ocr.words_with_colors import create_words_with_colors
-def create_app():
+# Skapa och konfigurera SocketIO
+socketio = SocketIO(logger=True, engineio_logger=True, cors_allowed_origins="*")
+
+# En lista för att hålla reda på anslutna användare
+connected_users = []
+
+def create_app(test_config=None):
+    # Skapa Flask-applikationen
     app = Flask(__name__)
+    
+    # Ställ in hemlig nyckel för sessionen
+    app.secret_key = os.getenv("APP_SECRET_KEY")
+    
+    # Konfigurera databasen
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///game.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Initiera SocketIO och databasanslutning med appen
+    socketio.init_app(app)
+    db_conn.init_app(app)
+    
+    # Lägg till CORS-stöd
+    CORS(app)
 
-    @app.route('/', methods=['GET', 'POST'])
-    def index():
-        detected_words = []
-        error = None
-        words_with_colors = []
-        if request.method == 'POST':
-
-            if 'file' not in request.files:
-                error = "No file part in request"
-            else:
-                file = request.files['file']
-                if file.filename == '':
-                    error = "Ingen vald fil"
-                else:
-                    try:
-                        image = load_and_preprocess_image(file)
-                        detected_words = detect_words(image) 
-                        if detected_words is None or len(detected_words) == 0:
-                            error = "Hittar inte tillräckligt många ord."
-                        else:
-                            words_with_colors = create_words_with_colors(detected_words)
-                    except Exception as e:
-                        error = f"Error: {str(e)}"
-
-        print(words_with_colors)
-        return render_template('routes/index.html', detected_words=detected_words, words_with_colors=words_with_colors, error=error)
-
+    # Skapa en route för att få sessiondata
+    @app.route('/get_session_data')
+    def get_session_data():
+        return jsonify({
+            'room_code': session.get('room_code'),
+            'username': session.get('username'),    
+            'user_id': session.get('user_id')
+        })
+    
+    # Registrera alla blueprints
+    register_blueprints(app)
 
     return app
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+def register_blueprints(app):
+    from .game_bp import game_bp  # Importera din blueprint
+    app.register_blueprint(game_bp, url_prefix='/')
+
+# SocketIO-händelser definieras efter `create_app`
+@socketio.on('my event')
+def test_message(message):
+    emit('my response', {'data': message['data']})
+
+@socketio.on('my broadcast event')
+def test_message(message):
+    emit('my response', {'data': message['data']}, broadcast=True)
+
+@socketio.on('connect')
+def test_connect():
+    emit('my response', {'data': 'Connected'})
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Välkommen
+{% endblock %}
+{%block head%}
+<link rel="stylesheet" href="{{ url_for('static', filename='register_user.css') }}">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+<script src="{{ url_for('static', filename='waiting_room.js') }}"></script>
+{%endblock%}
+{% block content %}
+<h1>Registrera dig till Rum {{ room_code }}</h1>
+
+<h1>Ange ditt namn för att gå med i rum {{ room_code }}</h1>
+<form action="{{ url_for('game.register_user') }}" method="POST">
+    <input type="text" name="username" placeholder="Ditt namn" required>
+    <button type="submit">Gå med</button>
+</form>
+
+
+{% endblock %}

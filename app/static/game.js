@@ -7,7 +7,6 @@ function showSelectedFile() {
   if (file) {
     fileNameDisplay.textContent = `Selected: ${file.name}`;
 
-    // Skapa en URL för förhandsvisningen
     const reader = new FileReader();
     reader.onload = function (e) {
       previewImage.src = e.target.result;
@@ -38,7 +37,7 @@ async function uploadImage() {
   resultDisplay.innerHTML = ""; // Rensa tidigare resultat
 
   try {
-    const response = await fetch("/", {
+    const response = await fetch("/game", {
       method: "POST",
       body: formData,
     });

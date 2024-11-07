@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+
+{%  block title %}
+  Lag
+{%  endblock %}
+
+
+{% block content %}
+  <div class="container-fluid">
+    <h1>Lagindelning</h1>
+
+    <h2>Röda laget</h2>
+    <ul>
+        {% for player in red_team %}
+            <li>{{ player }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Blåa laget</h2>
+    <ul>
+        {% for player in blue_team %}
+            <li>{{ player }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('players') }}">Tillbaka till inmatning</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='team_division.js') }}"></script>
+{% endblock %}

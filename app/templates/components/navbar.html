@@ -1,17 +1,19 @@
 <nav>
   <ul>
-    <li><a href="{{ url_for('index') }}">Home</a></li>
-    <li><a href="{{ url_for('index') }}">Team division</a></li>
-
     <li>
-      <form id="uploadForm" enctype="multipart/form-data" onsubmit="event.preventDefault(); uploadImage();">
-        <input class="hidden-file-input" type="file" name="file" id="fileInput" accept="image/*" onchange="updateFileName()">
+      <a href="{{ url_for('game.home') }}">Hem</a>
+      
+    </li>
     
-        <button type="button" onclick="document.getElementById('fileInput').click();" class="btn btn-secondary">Choose File</button>
-        <span id="fileName" style="margin-left: 10px; color: white;">No file chosen</span>
-
-        <button type="submit" class="btn btn-primary" style="margin-left: 10px;">Upload and Detect</button>
+    {% if session.get('owner_id') %}
+    <li>
+      <!-- Visa "Radera Rum"-knappen endast för rumsägaren -->
+      <form action="{{ url_for('game.delete_room') }}" method="POST" style="display:inline;">
+        <button type="submit" onclick="return confirm('Är du säker på att du vill radera rummet?')">
+          Radera Rum
+        </button>
       </form>
     </li>
+    {% endif %}
   </ul>
 </nav>

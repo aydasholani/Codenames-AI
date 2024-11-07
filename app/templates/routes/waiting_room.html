@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Välkommen
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='waiting_room.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+<!-- <script  type="text/javascript" charset="utf-8">
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var socket = io();
+        socket.on('connect', function() {
+            socket.send('User has connected!');
+            console.log(roomCode, 'connected!');
+        });
+        socket.on('message', function(msg) {
+            var p = document.createElement('p');
+            p.innerText = msg;
+            document.body.appendChild(p);
+        });
+    });
+</script> -->
+<script>
+    $(document).ready(function(){
+        var socket = io();
+        socket.on('my response', function(msg) {
+            $('#log').append('<p>Received: ' + msg.data + '</p>');
+        });
+        $('form#emit').submit(function(event) {
+            socket.emit('my event', {data: $('#emit_data').val()});
+            return false;
+        });
+        $('form#broadcast').submit(function(event) {
+            socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
+            return false;
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<h1 data-room-code="{{ room_code }}">Rum {{ room_code }}</h1>
+<h2>Registrerade spelare:</h2>
+
+<script>
+    const roomCode = "{{ room_code }}";
+    const owner = "{{ is_owner }}"
+    const users = "{{ all_users }}"
+    console.log("Ansluter till rum med kod:", roomCode);
+    console.log("Är du ägare?", owner);
+    console.log(users);
+
+</script>
+
+    <ul id="userList"></ul>
+
+
+
+{% if is_owner %}
+    <form action="{{ url_for('game.assign_teams') }}" method="POST">
+        <button type="submit" class="button">Tilldela lag</button>
+    </form>
+{% endif %}
+
+<script src="{{ url_for('static', filename='waiting_room.js') }}" defer></script>
+{% endblock %}

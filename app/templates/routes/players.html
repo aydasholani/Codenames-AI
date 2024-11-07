@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{%  block title %}
+  Lag indelning
+{%  endblock %}
+
+
+{% block content %}
+  <div class="container-fluid">
+
+    <h1>Skriv in spelarna</h1>
+    <form action="{{ url_for('players') }}" method="POST">
+      <div id="player-inputs">
+          <input type="text" name="player_names" placeholder="Spelare 1" required>
+          <input type="text" name="player_names" placeholder="Spelare 2" required>
+        </div>
+        <button type="button" onclick="addPlayerInput()">Lägg till spelare</button>
+        <button type="submit">Dela in i grupper</button>
+      </form>
+      
+  </div>
+
+  <script src="{{ url_for('static', filename='team_division.js') }}"></script>
+{% endblock %}
