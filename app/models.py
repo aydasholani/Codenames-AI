@@ -14,7 +14,6 @@ class Room(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'id': self.id,
             'owner_id': self.owner_id,
             'users': [user.to_dict() for user in self.users],
             'teams': [team.to_dict() for team in self.team]
@@ -23,7 +22,7 @@ class Room(db.Model):
 class Team(db.Model):
     __tablename__ = 'teams'
     id = db.Column(db.Integer(), primary_key=True)
-    color = db.Column(db.String(10), nullable=False)  # Lagets färg
+    color = db.Column(db.String(10), nullable=False)
     room_id = db.Column(db.String(6), db.ForeignKey('rooms.id'), nullable=False)
     
     users = db.relationship('User', backref='team', lazy=True)
@@ -44,7 +43,6 @@ class User(db.Model):
     is_agent = db.Column(db.Boolean(), default=False)
     room_id = db.Column(db.String(6), db.ForeignKey('rooms.id'), nullable=False)
     team_id = db.Column(db.Integer(), db.ForeignKey('teams.id'), nullable=True)
-    
     
     def to_dict(self):
         return {

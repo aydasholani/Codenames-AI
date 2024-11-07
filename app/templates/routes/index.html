@@ -1,32 +1,95 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Välkommen
+  Flask-SocketIO Sessions Example
 {% endblock %}
-{%block head%}
+
+{% block head %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+{% endblock %}
 
-{%endblock%}
 {% block content %}
-<div class="container-fluid">
+<div class="container mt-5">
+  <h1 class="text-center">Flask-SocketIO Rooms Example</h1>
 
-  <h1>Välkommen!</h1>
-  <form action="{{ url_for('game.create_room') }}" method="POST">
-    <label for="username">Användarnamn:</label>
-    <input type="text" id="username" name="username" required>
-    <button type="submit">Skapa Rum</button>
-  </form>
-  
-  <form action="{{ url_for('game.join_room_route') }}" method="POST">
-    <label for="room_code">Rums-kod:</label>
-    <input type="text" id="room_code" name="room_code" required>
-    
-    <label for="username">Användarnamn:</label>
-    <input type="text" id="username" name="username" required>
-    
-    <button type="submit">Anslut</button>
-  </form>
+  <!-- Create Room Form -->
+  <div class="mt-4">
+    <h3>Create Room</h3>
+    <form id="create-room-form">
+      <div class="mb-3">
+        <input type="text" id="create-username" name="username" class="form-control" placeholder="Enter your username" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Room</button>
+    </form>
+  </div>
+
+  <!-- Join Room Form -->
+  <div class="mt-4">
+    <h3>Join Room</h3>
+    <form id="join-room-form">
+      <div class="mb-3">
+        <input type="text" id="join-username" name="username" class="form-control" placeholder="Enter your username" required>
+      </div>
+      <div class="mb-3">
+        <input type="text" id="room_id" name="room_id" class="form-control" placeholder="Enter room ID" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Join Room</button>
+    </form>
+  </div>
 </div>
+
+<!-- Socket.IO Client Script -->
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const socket = io();
+
+    // Hantera Create Room formuläret
+    document.getElementById("create-room-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const username = document.getElementById("create-username").value;
+      if (!username) {
+        alert("Username is required to create a room");
+        return;
+      }
+      socket.emit("create_room", { username: username });
+    });
+
+    // Hantera Join Room formuläret
+    document.getElementById("join-room-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const username = document.getElementById("join-username").value;
+      const room_id = document.getElementById("room_id").value;
+      if (!username || !room_id) {
+        alert("Username and Room ID are required to join a room");
+        return;
+      }
+      socket.emit("join_room_event", { username: username, room_id: room_id });
+    });
+
+    // Skapa rummet och omdirigera till waiting_room
+    socket.on("room_created", function(data) {
+      if (data.room_id) {
+        window.location.href = `/waiting_room?room_id=${data.room_id}&username=${data.username}`;
+      } else {
+        alert(data.error || "Failed to create room.");
+      }
+    });
+
+    // Gå med i rummet och omdirigera till waiting_room
+    socket.on("join_success", function(data) {
+      if (data.room_id) {
+        window.location.href = `/waiting_room?room_id=${data.room_id}&username=${data.username}`;
+      } else {
+        alert(data.error || "Failed to join room.");
+      }
+    });
+
+    // Hantera fel vid rumsinträde
+    socket.on("join_error", function(data) {
+      alert(data.error || "An error occurred while joining the room.");
+    });
+  });
+</script>
 {% endblock %}
