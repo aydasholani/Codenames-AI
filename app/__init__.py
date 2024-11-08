@@ -40,15 +40,6 @@ def create_app(test_config=None):
     # Lägg till CORS-stöd
     CORS(app)
 
-    # Skapa en route för att få sessiondata
-    @app.route('/get_session_data')
-    def get_session_data():
-        return jsonify({
-            'room_code': session.get('room_code'),
-            'username': session.get('username'),    
-            'user_id': session.get('user_id')
-        })
-
     # Index route
     @app.route('/')
     def index():
@@ -57,8 +48,18 @@ def create_app(test_config=None):
     def waiting_room():
         room_id = request.args.get('room_id')
         username = request.args.get('username')
-
-        return render_template('routes/waiting_room.html', room_id=room_id, username=username)
+        
+        is_owner = False
+        room = Room.query.filter_by(id=room_id).first()
+        if not room:
+            return "Room not found", 404 
+        
+        current_user_id = session.get('owner_id')
+        if room.owner_id == current_user_id:
+            is_owner = True
+            
+        
+        return render_template('routes/waiting_room.html', room_id=room_id, username=username, is_owner=is_owner)
     # Registrera alla blueprints
     # register_blueprints(app)
     
@@ -69,21 +70,25 @@ def create_app(test_config=None):
             return "Username is required", 400
 
         # Generera och spara rums-ID
+
         room_id = generate_room_code()
-        new_room = Room(id=room_id, owner_id=1)  # Använd lämplig owner_id
-        db.session.add(new_room)
-        db.session.commit()
 
-        # Spara användaren och rummet i sessionen
-        session['username'] = username
-        session['room_id'] = room_id
-
-        # Skapa och spara användaren i databasen
         session_id = str(uuid.uuid4())
+        # Skapa och spara användaren i databasen
         new_user = User(username=username, room_id=room_id, session_id=session_id)
         db.session.add(new_user)
         db.session.commit()
+        
+        # Skapa och spara rummet
+        new_room = Room(id=room_id, owner_id=new_user.id)  
+        db.session.add(new_room)
+        db.session.commit()
 
+        session['username'] = username
+        session['room_id'] = room_id
+    
+     
+       
         # Omdirigera till waiting_room
         return redirect(url_for('routes/waiting_room', room_id=room_id))
     
@@ -97,6 +102,8 @@ def register_blueprints(app):
 def generate_room_code():
     """Genererar en unik 6-teckens rumskod."""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+connected_users = {}
 
 @socketio.on('create_room')
 def create_room(data):
@@ -114,9 +121,13 @@ def create_room(data):
     new_user = User(username=username, room_id=room_id, session_id=session_id)
     db.session.add(new_user)
     db.session.commit()
+    
+
+    
+    
 
     join_room(room_id)
-    emit('room_created', {'room_id': room_id, 'username': username, 'message': f'{username} created and joined room {room_id}'}, broadcast=True)
+    emit('room_created', {'room_id': room_id, 'username': username, 'message': f'{username} created and joined room {room_id}', 'is_owner': True}, broadcast=True)
 
 @socketio.on('join_room_event')
 def join_room_event(data):
@@ -131,6 +142,10 @@ def join_room_event(data):
     if not room:
         emit('join_error', {'error': 'Room not found'})
         return
+    if room_id not in connected_users:
+        connected_users[room_id] = []
+    if username not in connected_users[room_id]:
+        connected_users[room_id].append(username)
 
     session_id = str(uuid.uuid4())
     new_user = User(username=username, room_id=room_id, session_id=session_id)
@@ -138,18 +153,33 @@ def join_room_event(data):
     db.session.commit()
 
     join_room(room_id)
+    emit('update_user_list', {'users': connected_users[room_id]}, room=room_id, broadcast=True)
     emit('join_success', {'room_id': room_id, 'username': username}, to=request.sid)
-    emit('user_joined', {'room_id': room_id, 'username': username}, to=room_id, broadcast=True)
-    
+    # emit('user_joined', {'room_id': room_id, 'username': username}, to=room_id, broadcast=True)
+
+@socketio.on('leaving_room')
+def handle_leaving_room(data):
+    username = data.get('username')
+    room_id = data.get('room_id')
+
+    if room_id in connected_users and username in connected_users[room_id]:
+        connected_users[room_id].remove(username)
+        emit('update_user_list', {'users': connected_users[room_id]}, room=room_id, broadcast=True)
+        emit('user_left', {'username': username}, room=room_id, broadcast=True)
+           
 @socketio.on('connect')
 def test_connect():
     emit('my response', {'data': 'Connected'})
-
+    
 @socketio.on('disconnect')
 def handle_disconnect():
+    # Här kan vi lägga logik för att hantera när en användare kopplar från
     room_id = session.get('room_code')
     username = session.get('username')
-    if room_id and username:
-        print(f"{username} has left room {room_id}")
-        # Skicka ett meddelande till andra användare i rummet
-        emit('user_left', {'username': username}, to=room_id, broadcast=True)
+
+    
+    if room_id and username and room_id in connected_users:
+        if username in connected_users[room_id]:
+            connected_users[room_id].remove(username)
+            emit('update_user_list', {'users': connected_users[room_id]}, room=room_id)
+            emit('user_left', {'username': username}, room=room_id)

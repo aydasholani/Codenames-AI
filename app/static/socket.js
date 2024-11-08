@@ -1,42 +1,39 @@
 document.addEventListener("DOMContentLoaded", function () {
   const socket = io();
 
-  // Gå med i rummet direkt efter omdirigeringen
-  const roomId = "{{ room_id }}";
-  const username = "{{ username }}";
+  // Hämtar room_id och username från URL-parametrarna
+  const roomId = new URLSearchParams(window.location.search).get("room_id");
+  const username = new URLSearchParams(window.location.search).get("username");
 
+  // Emit för att gå med i rummet så fort sidan laddats
   socket.emit("join_room_event", { room_id: roomId, username: username });
 
-  // Hantera lyckad anslutning till rummet
-  socket.on("join_success", (data) => {
-    console.log(`${data.username} has joined room ${data.room_id}`);
-  });
-
-  // Hantera andra användare som går med i rummet
-  // socket.on("user_joined", (data) => {
-  //   const userList = document.getElementById("user-list");
-  //   const newUser = document.createElement("li");
-  //   newUser.textContent = `${data.username} joined the room`;
-  //   userList.appendChild(newUser);
-  // });
-
-  socket.on("user_joined", function (data) {
+  // Uppdaterar användarlistan när en ny användare ansluter
+  socket.on("update_user_list", function (data) {
     const userList = document.getElementById("user-list");
-    const existingUser = Array.from(userList.children).find(
-      (li) => li.textContent === `${data.username} joined the room`
-    );
+    userList.innerHTML = ""; // Rensar listan för att förhindra duplicering
 
-    if (!existingUser) {
+    data.users.forEach((user) => {
       const newUser = document.createElement("li");
-      newUser.textContent = `${data.username} joined the room`;
-      userList.appendChild(newUser);
-    }
-  });
-    socket.on("user_joined", function (data) {
-      const userList = document.getElementById("user-list");
-      const newUser = document.createElement("li");
-      newUser.textContent = `${data.username} joined the room`;
+      newUser.textContent = `${user} joined the room`;
       userList.appendChild(newUser);
     });
+  });
 
+  // Hantera användare som lämnar rummet
+  socket.on("user_left", function (data) {
+    const userList = document.getElementById("user-list");
+    const userItem = Array.from(userList.children).find((li) =>
+      li.textContent.includes(data.username)
+    );
+    if (userItem) {
+      userItem.textContent = `${data.username} left the room`;
+      userItem.style.color = "red"; // Visar att användaren har lämnat
+    }
+  });
+
+  // Emit när användaren stänger fliken eller webbläsaren
+  window.addEventListener("beforeunload", () => {
+    socket.emit("leaving_room", { room_id: roomId, username: username });
+  });
 });
