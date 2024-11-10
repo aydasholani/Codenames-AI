@@ -164,8 +164,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-modelv12/results
-datasets/
-runs
-modelv12/test
-skit
+modelv12/runs/detect/
+
